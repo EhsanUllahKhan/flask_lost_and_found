@@ -36,3 +36,13 @@ def new_user():
     except:
         return {'error': "Something went wrong", 'status': 404}
 
+@user_routes.route('/user/<email>', methods=['DELETE'])
+def delete_user(email):
+    try:
+        _user = db.session.query(UserModel).filter(UserModel.email == email).first()
+        db.session.delete(_user)
+        db.session.commit()
+        return {'status': 202}
+    except:
+        return {'error': "Email not found", 'status': 404}
+
