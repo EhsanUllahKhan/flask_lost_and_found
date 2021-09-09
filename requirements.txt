@@ -1,0 +1,11 @@
+sqlalchemy
+Flask==1.1.2
+Flask-Compress==1.4.0
+Flask-Migrate==2.1.1
+Flask-Script==2.0.6
+Flask-SQLAlchemy==2.5
+alembic
+mysqlclient
+python-dotenv
+pymysql
+cryptography
