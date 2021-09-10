@@ -1,11 +1,13 @@
 import datetime
 
+from Backend.Item.schema_item import *
+from Backend.validate_json import validate_json
+
 from Backend.Item import Item as item_routes
 from Backend.Models.Item_model import Item as ItemModel
 from flask import request, Response, jsonify
 import json
 from datetime import datetime
-# from Backend import db
 import app
 
 
@@ -24,6 +26,7 @@ def get_all_items():
         return {'error': "Something went wrong", 'status': 404}
 
 @item_routes.route('/item', methods=['POST'])
+@validate_json(lost_item_create_schema)
 def new_item():
     data = request.get_json(force=True)
     try:

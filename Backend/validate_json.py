@@ -6,18 +6,7 @@ from flask import (
     Response
 )
 from jsonschema import FormatChecker, validate, ValidationError
-
-# def validate_schema(schema_name):
-#     def decorator(f):
-#         @wraps(f)
-#         def wrapper(*args, **kw):
-#             try:
-#                 validate(data, schema, format_checker=FormatChecker())
-#             except ValidationError as e:
-#                 return jsonify({"error": e.message}), 400
-#             return f(*args, **kw)
-#         return wrapper
-#     return decorator
+from Backend.common.const import SCHEMA_VALIDATION_INVALID_DETAIL
 
 def validate_json(schema=None):
     """Validate input data regardless of the content type whether its a valid json or not"""
