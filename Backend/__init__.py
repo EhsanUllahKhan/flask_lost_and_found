@@ -1,7 +1,7 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 
-db = SQLAlchemy()
+# db = SQLAlchemy()
 
 def create_app():
     app = Flask(__name__)
@@ -11,9 +11,9 @@ def create_app():
     # db.app = app
 
     from Backend.User import User as user_routes
-    # from Backend.Item import Item as item_routes
+    from Backend.Item import Item as item_routes
 
     app.register_blueprint(user_routes)
-    # app.register_blueprint(item_routes)
+    app.register_blueprint(item_routes)
 
     return app

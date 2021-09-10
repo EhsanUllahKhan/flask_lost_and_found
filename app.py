@@ -1,7 +1,7 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from Backend import create_app
-from Backend.User import User as user_routes
+# from Backend.User import User as user_routes
 # from Backend.Item import Item as item_routes
 
 app = create_app()
