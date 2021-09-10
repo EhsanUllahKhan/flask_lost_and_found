@@ -4,6 +4,8 @@ from flask import request, Response, jsonify
 import json
 # from Backend import db
 from app import db
+from Backend.User.schema_user import *
+from Backend.validate_json import validate_json
 
 @user_routes.route('/user', methods=['GET'])
 def get_all_users():
@@ -20,6 +22,7 @@ def get_all_users():
         return {'error': "Something went wrong", 'status': 404}
 
 @user_routes.route('/user', methods=['POST'])
+@validate_json(user_create_schema)
 def new_user():
     data = request.get_json(force=True)
     try:
