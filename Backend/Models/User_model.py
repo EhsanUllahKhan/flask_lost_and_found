@@ -5,6 +5,7 @@ from ..db import Base
 
 
 class User(Base):      #db.Model
+    ID_KEY = "user_id"
     EMAIL_KEY = "email"
 
     __tablename__ = 'user'
@@ -18,5 +19,6 @@ class User(Base):      #db.Model
     def to_json(self):
         return {
             self.EMAIL_KEY: self.email,
+            self.ID_KEY: self.user_id
         }
 

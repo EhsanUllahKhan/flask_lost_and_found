@@ -5,6 +5,7 @@ from ..db import Base
 
 
 class Item(Base):
+    ID_KEY= "lost_item_id"
     NAME_KEY = "name"
     LOST_DATE_KEY = "lost_date"
     IS_FOUND_KEY = "is_found"
@@ -32,6 +33,7 @@ class Item(Base):
 
     def to_json(self):
         return {
+            self.ID_KEY: self.lost_item_id,
             self.NAME_KEY: self.name,
             self.LOST_DATE_KEY: self.lost_date,
             self.IS_FOUND_KEY: self.is_found,
