@@ -37,7 +37,10 @@ def new_user():
         )
         app.db.session.add(user)
         app.db.session.commit()
-        return {'status': 201}
+        return dict(
+            id=task.id,
+            url='http://0.0.0.0:5000/task/{}'.format(task.id)
+        )
     except:
         return {'error': "Something went wrong", 'status': 404}
 

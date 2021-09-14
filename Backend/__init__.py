@@ -10,8 +10,10 @@ def create_app():
 
     from Backend.User import User as user_routes
     from Backend.Item import Item as item_routes
+    from Backend.tasks import Task as task_routes
 
     app.register_blueprint(user_routes)
     app.register_blueprint(item_routes)
+    app.register_blueprint(task_routes)
 
     return app
