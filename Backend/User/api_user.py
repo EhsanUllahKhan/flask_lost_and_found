@@ -27,22 +27,12 @@ def new_user():
     data = request.get_json(force=True)
     task_name = "create_user_task"
     task = celery.send_task(task_name, args=[data['email']])
-    try:
-        _user = app.db.session.query(UserModel).filter(UserModel.email == data['email']).first()
-        if _user:
-            return {'status': 400}
 
-        user = UserModel(
-            email = data['email']
-        )
-        app.db.session.add(user)
-        app.db.session.commit()
-        return dict(
+    return dict(
             id=task.id,
             url='http://0.0.0.0:5000/task/{}'.format(task.id)
         )
-    except:
-        return {'error': "Something went wrong", 'status': 404}
+
 
 @user_routes.route('/user/<email>', methods=['DELETE'])
 def delete_user(email):

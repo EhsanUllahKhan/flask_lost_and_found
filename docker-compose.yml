@@ -25,11 +25,11 @@ services:
     depends_on:
       - db
 
-  rabbitmq:
-    image: rabbitmq:latest
-    environment:
-      RABBIT_ENV_RABBITMQ_USER: guest
-      RABBIT_ENV_RABBITMQ_PASSWORD: guest
+#  rabbitmq:
+#    image: rabbitmq:latest
+#    environment:
+#      RABBIT_ENV_RABBITMQ_USER: guest
+#      RABBIT_ENV_RABBITMQ_PASSWORD: guest
 
   worker:
     build: .
@@ -42,7 +42,7 @@ services:
       RABBIT_ENV_RABBITMQ_PASSWORD: guest
     depends_on:
       - redis_server
-      - rabbitmq
+#      - rabbitmq
       - app
 
   redis_server:

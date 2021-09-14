@@ -3,38 +3,42 @@ from Backend.Models.Task_model import Task as TaskModel
 from flask import request, Response, jsonify
 import json
 import app
-
+from Backend.common.celery_app import celery
 
 def create_task(task_id, task_type, status):
+
     try:
         task = TaskModel(
             task_id=task_id,
             task_type=task_type,
-            status=status,
-            task_result=None
+            task_status=status,
+            task_result=None,
+            message=None
         )
         app.db.session.add(task)
         app.db.session.commit()
-        return {'status': 201}
-    except:
-        return {'error': "Something went wrong while creating task", 'status': 404}
+        print('task created')
+    except Exception as ex:
+        raise ex
 
-def update_task(task_id, status, result, message):
+def update_task(task_id, status, result=None, message=None):
     try:
         _task = app.db.session.query(TaskModel).filter(TaskModel.task_id == task_id).first()
         if not _task:
             return Response(status=400)
 
-        _task.status = status
-        _task.result = result
+        _task.task_status = status
+        _task.task_result = result
         _task.message = message
         app.db.session.commit()
-        return {'status': 203}
-    except:
-        return {'error': "Something went wrong while updating task", 'status': 404}
+        print('task updated')
+    except Exception as ex:
+        raise ex
 
 @task_routes.route('/task/<task_id>', methods=['GET'])
 def get_task_details(task_id):
+    # return dict(task_status=celery.AsyncResult(task_id).state)
+
     try:
         tasks = app.db.session.query(TaskModel).filter(TaskModel.task_id == task_id).first()
         if not tasks:
