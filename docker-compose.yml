@@ -17,13 +17,38 @@ services:
     restart: always
     build: .
     container_name: web_flask
-    command: bash -c "sh ./entrypoint.sh"
+    command: bash -c "sh ./bin/entrypoint.sh"
     ports:
       - "5000:5000"
     volumes:
       - .:/flask
     depends_on:
       - db
+
+  rabbitmq:
+    image: rabbitmq:latest
+    environment:
+      RABBIT_ENV_RABBITMQ_USER: guest
+      RABBIT_ENV_RABBITMQ_PASSWORD: guest
+
+  worker:
+    build: .
+    container_name: worker
+    command: bash -c "sh ./bin/run_worker.sh"
+    volumes:
+    - .:/flask_lost_and_found
+    environment:
+      RABBIT_ENV_RABBITMQ_USER: guest
+      RABBIT_ENV_RABBITMQ_PASSWORD: guest
+    depends_on:
+      - redis_server
+      - rabbitmq
+      - app
+
+  redis_server:
+    image: redis:6-alpine
+    container_name: redis
+
 
 volumes:
   db_data:
