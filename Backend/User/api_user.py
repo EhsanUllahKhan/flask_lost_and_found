@@ -2,15 +2,15 @@ from Backend.User import User as user_routes
 from Backend.Models.User_model import User as UserModel
 from flask import request, Response, jsonify
 import json
-# from Backend import db
-from app import db
+import app
 from Backend.User.schema_user import *
 from Backend.validate_json import validate_json
+from Backend.common.celery_app import celery
 
 @user_routes.route('/user', methods=['GET'])
 def get_all_users():
     try:
-        users = db.session.query(UserModel).all()
+        users = app.db.session.query(UserModel).all()
         if not users:
             return Response(status=204)
 
@@ -25,16 +25,18 @@ def get_all_users():
 @validate_json(user_create_schema)
 def new_user():
     data = request.get_json(force=True)
+    task_name = "create_user_task"
+    task = celery.send_task(task_name, args=[data['email']])
     try:
-        _user = db.session.query(UserModel).filter(UserModel.email == data['email']).first()
+        _user = app.db.session.query(UserModel).filter(UserModel.email == data['email']).first()
         if _user:
             return {'status': 400}
 
         user = UserModel(
             email = data['email']
         )
-        db.session.add(user)
-        db.session.commit()
+        app.db.session.add(user)
+        app.db.session.commit()
         return {'status': 201}
     except:
         return {'error': "Something went wrong", 'status': 404}
@@ -42,9 +44,9 @@ def new_user():
 @user_routes.route('/user/<email>', methods=['DELETE'])
 def delete_user(email):
     try:
-        _user = db.session.query(UserModel).filter(UserModel.email == email).first()
-        db.session.delete(_user)
-        db.session.commit()
+        _user = app.db.session.query(UserModel).filter(UserModel.email == email).first()
+        app.db.session.delete(_user)
+        app.db.session.commit()
         return {'status': 202}
     except:
         return {'error': "Email not found", 'status': 404}
