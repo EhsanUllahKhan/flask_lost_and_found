@@ -44,9 +44,6 @@ def get_task_details(task_id):
         if not tasks:
             return Response(status=204)
 
-        tasks_list = list()
-        # for item in items:
-        tasks_list.append(tasks.to_json())
-        return Response(json.dumps(tasks_list, indent=4, sort_keys=True, default=str), mimetype='application/json')
+        return Response(json.dumps(tasks.to_json(), indent=4, sort_keys=True, default=str), mimetype='application/json')
     except:
         return {'error': "Something went wrong while deleting task", 'status': 404}

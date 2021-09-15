@@ -36,11 +36,11 @@ def new_user():
 
 @user_routes.route('/user/<email>', methods=['DELETE'])
 def delete_user(email):
-    try:
-        _user = app.db.session.query(UserModel).filter(UserModel.email == email).first()
-        app.db.session.delete(_user)
-        app.db.session.commit()
-        return {'status': 202}
-    except:
-        return {'error': "Email not found", 'status': 404}
+    task_name = "delete_user_task"
+    task = celery.send_task(task_name, args=[email])
+
+    return dict(
+            id=task.id,
+            url='http://0.0.0.0:5000/task/{}'.format(task.id)
+        )
 
