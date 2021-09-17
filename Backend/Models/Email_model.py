@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String
+from sqlalchemy import Column, Integer, String, Text
 
 from ..db import Base
 
@@ -15,11 +15,10 @@ class Email(Base):
     email_id = Column(Integer, primary_key=True, nullable=False)
     sender_email = Column(String(length=100), nullable=False)
     receiver_email = Column(String(length=100), nullable=False)
-    subject = Column(String(length=100))
-    message = Column(String(length=500))
+    subject = Column(String(length=100), nullable=False)
+    message = Column(Text)
 
-    def __init__(self, email_id, sender_email, receiver_email, subject, message):
-        self.email_id = email_id
+    def __init__(self, sender_email, receiver_email, subject, message):
         self.sender_email = sender_email
         self.receiver_email = receiver_email
         self.subject = subject

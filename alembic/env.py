@@ -13,7 +13,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 load_dotenv(os.path.join(BASE_DIR, ".env"))
 sys.path.append(BASE_DIR)
 
-from Backend.Models import User_model, Item_model, Task_model
+from Backend.Models import User_model, Item_model, Task_model, Email_model
 
 
 config = context.config

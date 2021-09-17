@@ -1,10 +1,11 @@
 from flask_sqlalchemy import SQLAlchemy
 from Backend import create_app
 from Backend import Models
+from flask_mail import Mail
 
 app = create_app()
 db = SQLAlchemy(app)
-
+# mail = Mail(app)
 
 @app.route('/')
 def hello_world():
