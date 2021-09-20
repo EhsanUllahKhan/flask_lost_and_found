@@ -4,11 +4,59 @@ from datetime import datetime
 from Backend.common.celery_app import celery
 from Backend.Models.User_model import User as UserModel
 from Backend.Models.Item_model import Item as ItemModel
+from Backend.Models.Email_model import Email as EmailModel
 import app
 from Backend.tasks.exceptions import EmailAlreadyExistException, UserDoesNotExistException, ItemNotFoundException
 from Backend.tasks.api_task import create_task, update_task
 import time
 from sqlalchemy.exc import IntegrityError
+from flask_mail import Message
+from Backend import mail
+from config import config
+
+
+@celery.task(name='send_async_email', bind=True)
+def send_async_email(self, *data):
+    # create_task(
+    #     task_id=self.request.id.__str__(),
+    #     task_type='SEND_EMAIL',
+    #     status=self.AsyncResult(self.request.id).state.upper()
+    # )
+    #
+    # time.sleep(5)
+    #
+    # self.update_state(state='IN_PROGRESS')
+    # update_task(
+    #     task_id=self.request.id.__str__(),
+    #     status=self.AsyncResult(self.request.id).state.upper()
+    # )
+    #
+    # time.sleep(5)
+    try:
+        email = EmailModel(
+            receiver_email=data[1]['receiver_email'],
+            subject=data[1]['subject'],
+            message=data[1]['message'],
+            sender_email=data[1]['sender_email']
+        )
+        app.db.session.add(email)
+        app.db.session.commit()
+
+        msg = Message(data[0]['subject'],
+                      sender=config.MAIL_DEFAULT_SENDER,
+                      recipients=[data[0]['to']])
+        msg.body = data[0]['body']
+
+        with app.app_context():
+            mail.send(msg)
+
+        # update_task(task_id=self.request.id.__str__(), status="COMPLETED", result="SUCCESS", message="SENT-EMAIL")
+
+    except Exception as ex:
+        app.db.session.rollback()
+        ex_type, ex_value, ex_traceback = sys.exc_info()
+        # update_task(task_id=self.request.id.__str__(), status="COMPLETED", result="FAILURE", message=str(ex_type.__name__))
+        raise ex
 
 @celery.task(name='create_user_task', bind=True)
 def task_create_user(self, *data):
@@ -185,3 +233,6 @@ def task_delete_user(self, *data):
         ex_type, ex_value, ex_traceback = sys.exc_info()
         update_task(task_id=self.request.id.__str__(), status="COMPLETED", result="FAILURE", message=str(ex_type.__name__))
         raise ex
+
+
+

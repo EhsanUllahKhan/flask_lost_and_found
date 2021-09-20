@@ -6,7 +6,7 @@ import app
 from Backend.Email.schema_email import email_create_schema
 from Backend.validate_json import validate_json
 from Backend.common.celery_app import celery
-from Backend.tasks.celery_app import send_async_email
+# from Backend.tasks.celery_app import send_async_email
 import uuid
 
 @email_routes.route('/email', methods=['GET'])
@@ -27,20 +27,28 @@ def get_all_emails():
 @email_routes.route('/email', methods=['POST'])
 @validate_json(email_create_schema)
 def new_email():
-    data = request.get_json(force=True)
-    task_name = "send_email_task"
-    email_data = {
-        'subject': data['subject'],
-        'to': data['receiver_email'],
-        'body': data['message'],
-    }
-    task_id = uuid.uuid4()
-    send_async_email.apply_async(args=(data['receiver_email'], data['subject'], data['message']), task_id=task_id)
-    # task = celery.send_task(task_name, args=[email_data, data])
 
+    # yagmail package
+    from Backend.common.email import send_emai_yagmail
+    data = request.get_json(force=True)
+    send_emai_yagmail.apply_async(args=(data['receiver_email'], data['subject'], data['message']))
     return dict(
-            id=task_id,
-            url='http://0.0.0.0:5000/task/{}'.format(task_id)
-        )
+        status=200
+    )
+
+    # from Backend.common.email import send_email
+
+    # task_name = "send_async_email"
+    # email_data = {
+    #     'subject': data['subject'],
+    #     'to': data['receiver_email'],
+    #     'body': data['message'],
+    # }
+    # task_id = uuid.uuid4()
+
+    # return dict(
+    #         id=task_id,
+    #         url='http://0.0.0.0:5000/task/{}'.format(task_id)
+    #     )
 
 

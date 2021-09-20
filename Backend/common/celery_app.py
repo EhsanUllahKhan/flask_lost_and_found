@@ -8,5 +8,7 @@ celery = Celery(
     "celery",
     broker=CELERY_BROKER_URL,
     backend=CELERY_RESULT_BACKEND,
-    include=['Backend.tasks.celery_app']
+    include=['Backend.tasks.celery_app', 'Backend.common.email']
 )
+
+
