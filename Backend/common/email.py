@@ -30,3 +30,16 @@ def send_emai_yagmail(to, subject, content):
         subject=subject,
         contents=content
     )
+
+
+@celery.task(name="send_email_with_attachment_yagmail")
+def send_with_attachment(to, subject, content, attachment):
+    MAIL_ID = config.MAIL_USERNAME
+    MAIL_PASSWORD = config.MAIL_PASSWORD
+    yag = yagmail.SMTP(MAIL_ID, MAIL_PASSWORD)
+    yag.send(
+        to=to,
+        subject=subject,
+        contents=content,
+        attachments=attachment,
+    )
