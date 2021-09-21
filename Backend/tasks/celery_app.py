@@ -13,16 +13,23 @@ from sqlalchemy.exc import IntegrityError
 from flask_mail import Message
 from Backend import mail
 from config import config
-
+from flask import current_app
+import smtplib, ssl
 
 @celery.task(name='send_async_email', bind=True)
 def send_async_email(self, *data):
+    from email import encoders
+    from email.mime.base import MIMEBase
+    from email.mime.multipart import MIMEMultipart
+    from email.mime.text import MIMEText
+
+    _app = current_app
     # create_task(
     #     task_id=self.request.id.__str__(),
     #     task_type='SEND_EMAIL',
     #     status=self.AsyncResult(self.request.id).state.upper()
     # )
-    #
+
     # time.sleep(5)
     #
     # self.update_state(state='IN_PROGRESS')
@@ -30,7 +37,7 @@ def send_async_email(self, *data):
     #     task_id=self.request.id.__str__(),
     #     status=self.AsyncResult(self.request.id).state.upper()
     # )
-    #
+
     # time.sleep(5)
     try:
         email = EmailModel(
@@ -42,13 +49,28 @@ def send_async_email(self, *data):
         app.db.session.add(email)
         app.db.session.commit()
 
-        msg = Message(data[0]['subject'],
-                      sender=config.MAIL_DEFAULT_SENDER,
-                      recipients=[data[0]['to']])
-        msg.body = data[0]['body']
+        # msg = Message(data[0]['subject'],
+        #               sender=config.MAIL_DEFAULT_SENDER,
+        #               recipients=[data[0]['to']])
+        # msg.body = data[0]['body']
 
-        with app.app_context():
-            mail.send(msg)
+        message = MIMEMultipart()
+        message["Subject"] = {data[0]['subject']}
+        message["To"] = {data[0]['to']}
+        message["From"] = {config.MAIL_DEFAULT_SENDER}
+        body = data[0]['body']
+        message.attach(MIMEText(body, "plain"))
+        # text = message.as_string()
+
+        context = ssl.create_default_context()
+        with smtplib.SMTP_SSL("smtp.gmail.com", config.MAIL_PORT, context=context) as server:
+            server.login(config.MAIL_USERNAME, config.MAIL_PASSWORD)
+            server.sendmail(
+                config.MAIL_DEFAULT_SENDER, data[0]['to'], message
+            )
+        print('Sent')
+        # with _app.app_context():
+        #     mail.send(msg)
 
         # update_task(task_id=self.request.id.__str__(), status="COMPLETED", result="SUCCESS", message="SENT-EMAIL")
 
